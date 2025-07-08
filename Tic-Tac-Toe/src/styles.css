@@ -71,6 +71,11 @@ body {
   width: 34px;
 }
 
+.square.highlight {
+  background: yellow;
+  border: 2px solid orange;
+}
+
 .board-row:after {
   clear: both;
   content: '';

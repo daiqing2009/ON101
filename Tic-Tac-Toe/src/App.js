@@ -1,30 +1,30 @@
 import { useState } from "react";
 
-function Square({ value, onSquareClick }) {
-  // const [value, setValue] = useState(null);
-  
-  // function handleClick() {
-  //   console.log("clicked!");
-  //   // setValue("X");
-  // }
-
-
-  return (<button className="square" onClick={onSquareClick}> {value} </button>);
+function Square({ value, onSquareClick, highlight }) {
+  return (
+    <button
+      className={"square" + (highlight ? " highlight" : "")}
+      onClick={onSquareClick}
+    >
+      {value}
+    </button>
+  );
 }
 
 function Board({xIsNext, squares, onPlay}) {
-  // const [squares, setSquares] = useState(Array(9).fill(null));
-  // const [xIsNext, setXIsNext] = useState(true);
-
-  const winner = calculateWinner(squares);
+  const result = calculateWinner(squares);
+  const winner = result ? result.winner : null;
+  const winningLine = result ? result.line : null;
   let status;
   if (winner) {
     status = "Winner: " + winner;
+  } else if (squares.every((sq) => sq !== null)) {
+    status = "Draw! No one wins.";
   } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
   function handleClick(i) {
-    if (squares[i]||calculateWinner(squares)) {
+    if (squares[i]||winner) {
       return;
     }
     const nextSquares = squares.slice();
@@ -33,8 +33,6 @@ function Board({xIsNext, squares, onPlay}) {
     } else {
       nextSquares[i] = "O";
     }
-    // setSquares(nextSquares);
-    // setXIsNext(!xIsNext);
     onPlay(nextSquares);
   }
 
@@ -44,8 +42,9 @@ function Board({xIsNext, squares, onPlay}) {
     const squaresInRow = [];
     for (let col = 0; col < 3; col++) {
       const idx = row * 3 + col;
+      const isHighlight = winningLine && winningLine.includes(idx);
       squaresInRow.push(
-        <Square key={idx} value={squares[idx]} onSquareClick={() => handleClick(idx)} />
+        <Square key={idx} value={squares[idx]} onSquareClick={() => handleClick(idx)} highlight={isHighlight} />
       );
     }
     boardRows.push(
@@ -76,7 +75,7 @@ function Board({xIsNext, squares, onPlay}) {
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return squares[a];
+        return { winner: squares[a], line: lines[i] };
       }
     }
     return null;
