@@ -105,7 +105,7 @@ export default function Game() {
     if(currentMove == move){
       description = "You are at move #" + move
       return (
-        <li>{description}</li>
+        <li key={move}>{description}</li>
       )
     } else {
       if(move > 0) {
